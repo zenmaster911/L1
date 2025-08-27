@@ -1,24 +1,19 @@
 package main
 
-import "fmt"
-
-type Human struct {
-}
-
-func (h Human) HelloWorld() {
-	fmt.Println("Hello world!")
-}
-
-func (h Human) OtherMethod() {
-	fmt.Println("Other Method")
-}
-
-type Action struct {
-	Human
-}
+import (
+	"fmt"
+	"sync"
+)
 
 func main() {
-	var Say Action
-	Say.HelloWorld()
-
+	var wg sync.WaitGroup
+	nums := [5]int{2, 4, 6, 8, 10}
+	for _, v := range nums {
+		wg.Add(1)
+		go func(v int) {
+			defer wg.Done()
+			fmt.Println(v * v)
+		}(v)
+	}
+	wg.Wait()
 }

@@ -2,18 +2,16 @@ package main
 
 import (
 	"fmt"
-	"sync"
 )
 
 func main() {
 	var workerAmount int
-	var wg sync.WaitGroup
 	fmt.Scan(&workerAmount)
 	dataflow := make(chan any, workerAmount)
+	fmt.Println("to stop the flow write anything but numbers")
 
-	wg.Add(workerAmount)
 	for i := 1; i <= workerAmount; i++ {
-		go worker(i, dataflow, &wg)
+		go worker(i, dataflow)
 	}
 	// go func() {
 	var data int
@@ -29,8 +27,8 @@ func main() {
 
 }
 
-func worker(id int, jobs chan any, wg *sync.WaitGroup) {
-	defer wg.Done()
+func worker(id int, jobs chan any) {
+
 	for v := range jobs {
 		fmt.Printf("воркер %d получил работу %v\n ", id, v)
 	}

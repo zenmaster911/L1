@@ -6,14 +6,32 @@ import (
 )
 
 func main() {
+	var workerAmount int
 	var wg sync.WaitGroup
-	nums := [5]int{2, 4, 6, 8, 10}
-	for _, v := range nums {
-		wg.Add(1)
-		go func(v int) {
-			defer wg.Done()
-			fmt.Println(v * v)
-		}(v)
+	fmt.Scan(&workerAmount)
+	dataflow := make(chan any, workerAmount)
+
+	wg.Add(workerAmount)
+	for i := 1; i <= workerAmount; i++ {
+		go worker(i, dataflow, &wg)
 	}
-	wg.Wait()
+	// go func() {
+	var data int
+	for {
+		_, err := fmt.Scan(&data)
+		if err != nil {
+			fmt.Printf("неверный формат ввода %v", err)
+			break
+		}
+		dataflow <- data
+	}
+	// }()
+
+}
+
+func worker(id int, jobs chan any, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for v := range jobs {
+		fmt.Printf("воркер %d получил работу %v\n ", id, v)
+	}
 }

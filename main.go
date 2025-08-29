@@ -14,7 +14,7 @@ func main() {
 	var wg sync.WaitGroup
 	var workerAmount int
 	fmt.Scan(&workerAmount)
-	//activeWorkers := new(sync.Map)
+
 	wg.Add(workerAmount)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -72,17 +72,6 @@ func main() {
 
 	}
 }
-
-// func ActiveWorkerAwait(m *sync.Map) {
-// 	m.Range(func(key any, value any) bool {
-// 		workerId := key.(int)
-// 		ch := value.(chan struct{})
-// 		<-ch
-// 		fmt.Printf("worker %d finished it's work\n", workerId)
-// 		return true
-// 	})
-
-// }
 
 func worker(ctx context.Context, wg *sync.WaitGroup, id int, jobs, result chan any) {
 	defer wg.Done()

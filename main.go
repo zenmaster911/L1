@@ -4,89 +4,48 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/signal"
-	"sync"
-	"syscall"
 	"time"
 )
 
 func main() {
-	var wg sync.WaitGroup
-	var workerAmount int
-	fmt.Scan(&workerAmount)
-
-	wg.Add(workerAmount)
-
-	ctx, cancel := context.WithCancel(context.Background())
+	var N int64 //lifetime of this app
+	fmt.Scan(&N)
+	ch := make(chan string)
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Duration(N)*time.Second))
 	defer cancel()
 
-	dataflow := make(chan any, workerAmount)
-	result := make(chan any, workerAmount)
-	defer close(dataflow)
-
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-
-	fmt.Println("to stop the flow press ctrl+C")
-
-	for i := 1; i <= workerAmount; i++ {
-		go worker(ctx, &wg, i, dataflow, result)
-	}
-
-	go func() {
-
-		<-sig
-		fmt.Println("termination signal received")
-		cancel()
-
-	}()
-
-	go func() {
-		var data int
-		defer close(dataflow)
+	go func() { //routine to receive data
 		for {
-			_, err := fmt.Scan(&data)
-			if err != nil {
-				fmt.Printf("неверный формат ввода %v", err)
-				break
-			}
+
 			select {
-			case dataflow <- data:
 			case <-ctx.Done():
 				return
+
+			default:
+				var data string
+				fmt.Fscanln(os.Stdin, &data)
+				fmt.Println("data received")
+				ch <- data
+
 			}
 		}
 	}()
+	Worker(ch, ctx)
 
-	for {
-		select {
-		case res := <-result:
-			fmt.Printf("result is %v\n", res)
-		case <-ctx.Done():
-			fmt.Println("waiting for the workers")
-			wg.Wait()
-			close(result)
-			fmt.Println("shutting down")
-			return
-		}
-
-	}
 }
 
-func worker(ctx context.Context, wg *sync.WaitGroup, id int, jobs, result chan any) {
-	defer wg.Done()
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case job, ok := <-jobs:
-			if !ok {
-				return
-			}
-			fmt.Printf("воркер %d получил работу %v\n ", id, job)
-			time.Sleep(time.Second * 6)
-			result <- job
+func Worker(ch chan string, ctx context.Context) error {
 
+	for {
+
+		select {
+		case data := <-ch:
+			fmt.Println("magic was made with", data)
+		case <-ctx.Done():
+			fmt.Println(ctx.Err())
+			return ctx.Err()
 		}
+
 	}
+
 }

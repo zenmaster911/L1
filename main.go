@@ -1,27 +1,28 @@
 package main
 
-import (
-	"fmt"
-	"log"
-)
+import "fmt"
 
 func main() {
-	var number int64
-	var requiredBit int
-	value := true
-	fmt.Println("enter the number, required bit and Value you would like to set")
-	_, err := fmt.Scan(&number, &requiredBit, &value)
-	if err != nil {
-		log.Fatalf("data input error: %v", err)
-	}
-	fmt.Println("\n", bitConverser(number, requiredBit-1, value))
-}
 
-func bitConverser(number int64, bit int, value bool) int64 {
-	mask := int64(1 << bit)
-	if value {
-		return number | mask
-	}
-	return number &^ mask
+	nums := [5]int{1, 2, 3, 4, 5}
+	ch1 := make(chan int)
+	ch2 := make(chan int)
+	go func() {
+		defer close(ch1)
+		for _, v := range nums {
+			ch1 <- v
+		}
 
+	}()
+	go func() {
+		defer close(ch2)
+		for val := range ch1 {
+			ch2 <- val * 2
+		}
+	}()
+
+	for result := range ch2 {
+
+		fmt.Println(result)
+	}
 }

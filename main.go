@@ -3,26 +3,11 @@ package main
 import "fmt"
 
 func main() {
-
-	nums := [5]int{1, 2, 3, 4, 5}
-	ch1 := make(chan int)
-	ch2 := make(chan int)
-	go func() {
-		defer close(ch1)
-		for _, v := range nums {
-			ch1 <- v
-		}
-
-	}()
-	go func() {
-		defer close(ch2)
-		for val := range ch1 {
-			ch2 <- val * 2
-		}
-	}()
-
-	for result := range ch2 {
-
-		fmt.Println(result)
+	orderedTemp := make(map[int][]string)
+	temp := []float64{-25.4, -27.0, 13.0, 19.0, 15.5, 24.5, -21.0, 32.5}
+	for _, v := range temp {
+		orderedTemp[int(v/10)*10] = append(orderedTemp[int(v/10)*10], fmt.Sprintf("%.1f", v))
+		// orderedTemp[int(v/10)*10] = append(orderedTemp[int(v/10)*10], v) в случае если можно пренебречь отображением 0 после запятой
 	}
+	fmt.Println(orderedTemp)
 }

@@ -2,36 +2,35 @@ package main
 
 import (
 	"fmt"
+	"slices"
 )
 
 func main() {
-	nums := []int{1, 6, 3, 5, 76, 45, 64, -92}
-	fmt.Println(quickSort(nums))
+	nums := []int{}
+	slices.Sort(nums)
+	fmt.Println(nums, binarySearch(1, nums))
 }
 
-func quickSort(input []int) []int {
-	if len(input) <= 1 {
-		return input
+func binarySearch(target int, input []int) int {
+	if len(input) == 0 {
+		return -1
 	}
-
-	pivot := input[0]
-	left := make([]int, 0)
-	right := make([]int, 0)
-	middle := make([]int, 0)
-	for _, v := range input {
-		if v < pivot {
-			left = append(left, v)
-		} else if v > pivot {
-			right = append(right, v)
-		} else {
-			middle = append(middle, v)
+	left := 0
+	right := len(input) - 1
+	i := (left + right + 1) / 2
+	for {
+		if target < input[left] || target > input[right] {
+			return -1
 		}
+		if input[i] == target {
+			return i
+		} else if input[i] < target {
+			left = i + 1
+			i = (left + right + 1) / 2
+		} else {
+			right = i - 1
+			i = (left + right) / 2
+		}
+
 	}
-	left = quickSort(left)
-	right = quickSort(right)
-
-	left = append(left, middle...)
-	left = append(left, right...)
-	return left
-
 }

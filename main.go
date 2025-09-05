@@ -1,45 +1,24 @@
 package main
 
 import (
-	"fmt"
-	"reflect"
+	"strings"
 )
 
+var justString string //предположим что эта переменная должна быть глобальной
+
 func main() {
-	data := []interface{}{
-		"asdfa",
-		3241,
-		true,
-		make(chan any),
-		nil,
-	}
-	for _, v := range data {
-		typeDeterminator(v)
-	}
+
+	someFunc()
+	justString = someFunc2()
 }
 
-func typeDeterminator(data any) any {
-	value := reflect.ValueOf(data)
-	kind := value.Kind()
-
-	switch kind {
-	case reflect.Int:
-		fmt.Println("data type is integer")
-		determinedData := data.(int)
-		return determinedData
-	case reflect.String:
-		fmt.Println("data type is string")
-		determinedData := data.(string)
-		return determinedData
-	case reflect.Bool:
-		fmt.Println("data type is bool")
-		determinedData := data.(bool)
-		return determinedData
-	case reflect.Chan:
-		cType := value.Type().String()
-		fmt.Printf("data type is %s \n", cType)
-		return data
-	}
-	fmt.Println("type can't be determinated")
-	return nil
+func someFunc2() string { // этот вариант так-же сделает присваивание значения переменной justString
+	v := createHugeString(1 << 10) // более наглядным, а функцию универсальной
+	return strings.Clone(v[:100])
 }
+
+func someFunc() {
+	v := createHugeString(1 << 10) //justString = v[:100]  в данной реализации justString ссылается на небольшой фрагмент v
+	newV := strings.Clone(v[:100]) // тем самым не давая сборщику мусора очистить память от лишних символов
+	justString = newV              // эта строка кода решает проблему, создаваю новую строку
+} // меньшего размера, тем самым позволяя сборщику очистить память от огромной v

@@ -1,24 +1,37 @@
 package main
 
 import (
-	"strings"
+	"fmt"
 )
 
-var justString string //предположим что эта переменная должна быть глобальной
-
 func main() {
-
-	someFunc()
-	justString = someFunc2()
+	nums := []int{1, 6, 3, 5, 76, 45, 64, -92}
+	fmt.Println(quickSort(nums))
 }
 
-func someFunc2() string { // этот вариант так-же сделает присваивание значения переменной justString
-	v := createHugeString(1 << 10) // более наглядным, а функцию универсальной
-	return strings.Clone(v[:100])
-}
+func quickSort(input []int) []int {
+	if len(input) <= 1 {
+		return input
+	}
 
-func someFunc() {
-	v := createHugeString(1 << 10) //justString = v[:100]  в данной реализации justString ссылается на небольшой фрагмент v
-	newV := strings.Clone(v[:100]) // тем самым не давая сборщику мусора очистить память от лишних символов
-	justString = newV              // эта строка кода решает проблему, создаваю новую строку
-} // меньшего размера, тем самым позволяя сборщику очистить память от огромной v
+	pivot := input[0]
+	left := make([]int, 0)
+	right := make([]int, 0)
+	middle := make([]int, 0)
+	for _, v := range input {
+		if v < pivot {
+			left = append(left, v)
+		} else if v > pivot {
+			right = append(right, v)
+		} else {
+			middle = append(middle, v)
+		}
+	}
+	left = quickSort(left)
+	right = quickSort(right)
+
+	left = append(left, middle...)
+	left = append(left, right...)
+	return left
+
+}

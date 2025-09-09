@@ -2,35 +2,39 @@ package main
 
 import (
 	"fmt"
-	"slices"
+	"sync"
+	"sync/atomic"
 )
 
-func main() {
-	nums := []int{}
-	slices.Sort(nums)
-	fmt.Println(nums, binarySearch(1, nums))
+type Counter struct {
+	clicker int64
 }
 
-func binarySearch(target int, input []int) int {
-	if len(input) == 0 {
-		return -1
-	}
-	left := 0
-	right := len(input) - 1
-	i := (left + right + 1) / 2
-	for {
-		if target < input[left] || target > input[right] {
-			return -1
-		}
-		if input[i] == target {
-			return i
-		} else if input[i] < target {
-			left = i + 1
-			i = (left + right + 1) / 2
-		} else {
-			right = i - 1
-			i = (left + right) / 2
-		}
+func main() {
+	var counter Counter
+	var wg sync.WaitGroup
+	var incrementer int
 
+	for i := 0; i < 4; i++ {
+		wg.Add(2)
+		go func(wg *sync.WaitGroup) {
+			defer wg.Done()
+			for i := 0; i < 1000; i++ {
+				atomic.AddInt64(&counter.clicker, 1)
+			}
+		}(&wg)
+		go withMutex(&incrementer, &wg)
+	}
+	wg.Wait()
+	fmt.Println(counter.clicker, incrementer)
+}
+
+func withMutex(num *int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	var mx sync.Mutex
+	for i := 0; i < 2000; i++ {
+		mx.Lock()
+		*num++
+		mx.Unlock()
 	}
 }

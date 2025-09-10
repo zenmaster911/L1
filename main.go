@@ -42,7 +42,13 @@ func withoutSliceslib() {
 	fmt.Println("to stop scanning print \"end\"")
 
 	for scanner.Scan() {
+
 		inputData := scanner.Text()
+
+		if inputData == "end" {
+			break
+		}
+
 		fmt.Println(wordOrderReverse(inputData))
 
 	}

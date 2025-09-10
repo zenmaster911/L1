@@ -1,74 +1,70 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"slices"
-	"strings"
 )
 
+type exclaimer interface {
+	exclaim()
+}
+
+type example1 struct{}
+
+type example2 struct{}
+
+type balerina struct{}
+
+func (ex example1) experiment() {
+	fmt.Println("Меня сейчас адаптируют")
+}
+
+func (ex example2) experimentResult() {
+	fmt.Println("меня адпатировали")
+}
+
+func (bal balerina) piruet() {
+	fmt.Println("А я - балерина!")
+}
+
+type adapter1 struct {
+	*example1
+}
+
+type adapter2 struct {
+	*example2
+}
+
+type baleriner struct {
+	*balerina
+}
+
+func (a1 adapter1) exclaim() {
+	a1.experiment()
+}
+
+func NewAdapter1(ex *example1) *adapter1 {
+	return &adapter1{ex}
+}
+
+func (a2 adapter2) exclaim() {
+	a2.experimentResult()
+}
+
+func NewAdapter2(ex *example2) *adapter2 {
+	return &adapter2{ex}
+}
+
+func (b baleriner) exclaim() {
+	b.piruet()
+}
+
+func NewBaleriner(bal *balerina) *baleriner {
+	return &baleriner{bal}
+}
+
 func main() {
-	fmt.Println("choose func you would like to use:\n print 1 to use func with Slices\n print 2 to avoid using slices")
-	var choise int
-	fmt.Scan(&choise)
-	switch choise {
-	case 1:
-		withSliceslib()
-	case 2:
-		withoutSliceslib()
+	madHouse := []exclaimer{NewAdapter1(&example1{}), NewAdapter2(&example2{}), NewBaleriner(&balerina{})}
+	for _, ward := range madHouse {
+		ward.exclaim()
 	}
-}
-
-func withSliceslib() {
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Split(bufio.ScanLines)
-	fmt.Println("to stop scanning print \"end\"")
-	for scanner.Scan() {
-		initialPhrase := scanner.Text()
-		if initialPhrase == "end" {
-			break
-		}
-		slice := strings.Split(initialPhrase, " ")
-		slices.Reverse(slice)
-		newPhrase := strings.Join(slice, " ")
-		fmt.Println(newPhrase)
-	}
-}
-
-func withoutSliceslib() {
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Split(bufio.ScanLines)
-	fmt.Println("to stop scanning print \"end\"")
-
-	for scanner.Scan() {
-
-		inputData := scanner.Text()
-
-		if inputData == "end" {
-			break
-		}
-
-		fmt.Println(wordOrderReverse(inputData))
-
-	}
-}
-
-func wordOrderReverse(str string) string {
-	var newstr []byte
-	var end int
-	end = len(str)
-	for b := end - 1; b >= 0; b-- {
-		if str[b] == byte(' ') {
-			newstr = append(newstr, str[b:end]...)
-			end = b
-		}
-		if b == 0 {
-			newstr = append(newstr, byte(' '))
-			newstr = append(newstr, str[b:end]...)
-		}
-	}
-	newstr = newstr[1:]
-
-	return string(newstr)
 }

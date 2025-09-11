@@ -2,54 +2,26 @@ package main
 
 import (
 	"fmt"
-	"math/big"
 )
 
 func main() {
-	for {
+	oldSlice := []int{1, 2, 3, 4, 5, 6, 7, 8}
+	index := 3
+	newSlice1 := shorter1(oldSlice, index)
+	newSlice2 := shorter2(oldSlice, index)
+	fmt.Println(newSlice1, newSlice2)
+}
 
-		var a, b big.Int
-		var operator string
-		var stop string
-		fmt.Println("желаете продолжить? y/n")
-		fmt.Scan(&stop)
-		if stop == "n" {
-			break
-		} else if stop != "y" {
-			fmt.Println("команда неясна, попробуйте снова")
-		}
-		fmt.Println("Введите первое число")
+func shorter1[S ~[]E, E any](slice S, ind int) S {
+	newSlice := make([]E, len(slice)-1, len(slice)-1)
+	copy(newSlice[:ind], slice[:ind])
+	copy(newSlice[ind:], slice[ind+1:])
+	return newSlice
+}
 
-		if _, err := fmt.Scan(&a); err != nil {
-			fmt.Printf("first number scanning error: %v\n", err)
-			continue
-		}
-
-		fmt.Println("Введите один из следующих операндов: '+' '-' '*' '/'")
-		if _, err := fmt.Scan(&operator); err != nil {
-			//fmt.Errorf()
-			fmt.Printf("operator scanning error: %v\n", err)
-			continue
-		}
-
-		fmt.Println("Введите второе число")
-		if _, err := fmt.Scanln(&b); err != nil {
-			fmt.Printf("second number scanning error: %v", err)
-			continue
-		}
-
-		switch operator {
-		case "+":
-			fmt.Printf("результат операции: %v\n", a.Add(&a, &b))
-		case "*":
-			fmt.Printf("результат операции: %v\n", a.Mul(&a, &b))
-		case "-":
-			fmt.Printf("результат операции: %v\n", a.Sub(&a, &b))
-		case "/":
-			fmt.Printf("результат операции: %v\n", a.Div(&a, &b))
-		default:
-			fmt.Println("invalid operator")
-		}
-
-	}
+func shorter2[S ~[]E, E any](slice S, ind int) S {
+	newSlice := make([]E, 0, len(slice)-1)
+	newSlice = append(newSlice, slice[:ind]...)
+	newSlice = append(newSlice, slice[ind+1:]...)
+	return newSlice
 }

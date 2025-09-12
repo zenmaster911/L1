@@ -2,26 +2,24 @@ package main
 
 import (
 	"fmt"
+	"math"
 )
 
+type Point struct {
+	x float64
+	y float64
+}
+
+func newPoint(x, y float64) *Point {
+	return &Point{x: x, y: y}
+}
+
+func (p Point) distance(point Point) float64 {
+	return math.Sqrt(math.Pow(p.x-point.x, 2) + math.Pow(p.y-point.y, 2))
+}
+
 func main() {
-	oldSlice := []int{1, 2, 3, 4, 5, 6, 7, 8}
-	index := 3
-	newSlice1 := shorter1(oldSlice, index)
-	newSlice2 := shorter2(oldSlice, index)
-	fmt.Println(newSlice1, newSlice2)
-}
-
-func shorter1[S ~[]E, E any](slice S, ind int) S {
-	newSlice := make([]E, len(slice)-1, len(slice)-1)
-	copy(newSlice[:ind], slice[:ind])
-	copy(newSlice[ind:], slice[ind+1:])
-	return newSlice
-}
-
-func shorter2[S ~[]E, E any](slice S, ind int) S {
-	newSlice := make([]E, 0, len(slice)-1)
-	newSlice = append(newSlice, slice[:ind]...)
-	newSlice = append(newSlice, slice[ind+1:]...)
-	return newSlice
+	a := newPoint(2, 2)
+	b := newPoint(5, 2)
+	fmt.Println(a.distance(*b))
 }

@@ -2,24 +2,27 @@ package main
 
 import (
 	"fmt"
-	"sync"
-	"time"
+	"unicode"
 )
 
 func main() {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for i := 0; i < 5; i++ {
-			fmt.Println(i + 1)
-			Sleep(2)
-		}
-	}()
-	wg.Wait()
+	str1 := "asdfghjфывт"
+	str2 := "asdfAghj"
+	str3 := "ФФывт"
+	fmt.Println(UnicRunesCheck(str1))
+	fmt.Println(UnicRunesCheck(str2))
+	fmt.Println(UnicRunesCheck(str3))
+
 }
 
-func Sleep(duration time.Duration) {
-	timer := time.NewTimer(duration * time.Second)
-	<-timer.C
+func UnicRunesCheck(str string) bool {
+	checkmap := make(map[rune]struct{})
+	for _, v := range str {
+		val := unicode.ToLower(v)
+		if _, ok := checkmap[val]; ok {
+			return false
+		}
+		checkmap[val] = struct{}{}
+	}
+	return true
 }
